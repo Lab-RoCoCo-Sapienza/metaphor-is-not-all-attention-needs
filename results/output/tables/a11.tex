@@ -1,0 +1,25 @@
+\begin{table}[!t]
+\centering
+\caption{Format probes stratified by the attacker persona of the prose baseline. By construction, each poem inherits the persona (\emph{skilled} or \emph{unskilled}) of the \textit{MLCommons AILuminate} prompt from which it was generated. The main-probe row reproduces \autoref{tab:probe-results}. The pooled contrast uses all 2303 cleaned feature rows used by the main format probe; the remaining contrasts apply the stated persona restrictions and subsampling to that same pool. \emph{Persona-matched} contrasts hold the persona constant on both sides, so that only the format varies; \emph{persona-restricted} contrasts pool poetry over both personas and restrict prose to one persona, subsampling poetry to the same size; the \emph{persona contrast} separates the two prose personas. Values are test accuracy, mean$_{\pm \text{std}}$ across cross-validation folds.}
+\label{tab:persona_strat}
+\scalebox{0.9}{
+\begin{tabular}{lccc}
+\toprule
+\textbf{Contrast} & \textbf{LogReg} & \textbf{MLP} & \textbf{SVC} \\
+\midrule
+\multicolumn{4}{l}{\emph{Main probe}} \\
+\quad poetry vs.\ prose, all personas & $0.985_{\pm 0.006}$ & $0.993_{\pm 0.006}$ & $0.993_{\pm 0.006}$ \\
+\midrule
+\multicolumn{4}{l}{\emph{Persona-matched}} \\
+\quad poetry vs.\ prose, both skilled   & $0.976_{\pm 0.005}$ & $0.971_{\pm 0.012}$ & $0.984_{\pm 0.009}$ \\
+\quad poetry vs.\ prose, both unskilled & $0.992_{\pm 0.006}$ & $0.995_{\pm 0.005}$ & $0.997_{\pm 0.002}$ \\
+\midrule
+\multicolumn{4}{l}{\emph{Persona-restricted}} \\
+\quad poetry vs.\ skilled-persona prose   & $0.980_{\pm 0.005}$ & $0.972_{\pm 0.005}$ & $0.984_{\pm 0.004}$ \\
+\quad poetry vs.\ unskilled-persona prose & $0.991_{\pm 0.008}$ & $0.997_{\pm 0.003}$ & $0.997_{\pm 0.004}$ \\
+\midrule
+\multicolumn{4}{l}{\emph{Persona contrast}} \\
+\quad skilled vs.\ unskilled-persona prose & $0.650_{\pm 0.023}$ & $0.647_{\pm 0.038}$ & $0.629_{\pm 0.021}$ \\
+\bottomrule
+\end{tabular}}
+\end{table}
