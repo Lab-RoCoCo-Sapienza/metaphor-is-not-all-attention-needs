@@ -45,7 +45,7 @@ results/
 tests/
 ```
 
-## What is reproduced, and how
+## Experiments
 
 
 - **Table 1.** Logistic regression (L1) and the RBF SVC use five outer folds, grouped by prompt for the format probe, with C chosen by inner cross-validation after scaling the outer training fold. The MLP is scored on five seeded 72/13/15 partitions. Prose safety uses five balanced subsamples of 122 safe and 122 unsafe prompts.
