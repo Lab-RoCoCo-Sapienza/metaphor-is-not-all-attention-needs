@@ -1,7 +1,7 @@
 [project]
-name = "poetry-attention-probes"
+name = "metaphor-is-not-all-attention-needs"
 version = "1.0.0"
-description = "Probes over 72-dimensional attention feature vectors for the paper 'Metaphor Is Not All Attention Needs'"
+description = "Code for the paper 'Metaphor Is Not All Attention Needs': attention extraction from Qwen3-14B and probes over the resulting attention features"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [

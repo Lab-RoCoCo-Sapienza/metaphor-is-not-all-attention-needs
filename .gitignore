@@ -3,3 +3,4 @@ __pycache__/
 .pytest_cache/
 extraction_results/
 probing_results/output/
+.venv-extract/
