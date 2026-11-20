@@ -1,54 +1,206 @@
-## Metaphor Is Not All Attention Needs
+# Metaphor Is Not All Attention Needs
 
+*Metaphor Is Not All Attention Needs* investigates why literary jailbreaks, stylistic reformulations
+of harmful requests such as poems and the narrative variants obtained by ablating their poetic
+devices, bypass the safety training of large language models. Using `Qwen3-14B` as an open-weight
+case study, the paper combines input-level ablations of poetic devices with a novel, interpretable
+72-dimensional representation of attention maps, which it clusters and probes. The representation
+aggregates attention over generation phases, layer clusters and functional token groups, with every
+prompt token annotated for its semantic role (figurative language, harmful payload, setup, technical terms,
+function words, punctuation).
 
-This repository allows for the reproduction of the results of *Metaphor Is Not All Attention Needs*, a mechanistic interpretability paper on adversarial poetry, with a focus on attention's patterns. 
+The paper was accepted at NeurIPS 2026; the preprint is on [arXiv](https://arxiv.org/abs/2605.12128).
 
-The paper was accepted at NeurIPS 2026, and the pre-print can be read on [arXiv](https://arxiv.org/abs/2605.12128
-).
+## Findings
 
-The code currently in the repository refits the probing results from the released 72-dimensional feature vectors and regenerates the paper’s tables.
+- Probes distinguish poetry from prose with high accuracy, yet struggle to predict jailbreak success
+  within each format. Jailbreak success is therefore unlikely to stem from a failure to recognize
+  poetic formatting; rather, poetic prompts induce distinct processing patterns that remain largely
+  independent of the safety outcome.
+- The ablations show that literary jailbreaks misalign the model not through any single poetic
+  device, but through accumulated stylistic and structural irregularities that alter prompt
+  processing and avoid lexical triggers learned during post-training.
+- Robust safety mechanisms may therefore need to account for style-induced shifts in model behavior.
 
-To run the code simply:
+<sub>Findings are established on <code>Qwen3-14B</code> as a case study and are testable hypotheses for other models.</sub>
 
-```sh
-uv sync --locked
-uv run python -m probes all
-```
+## This repository
 
-`all` refits Table 1 and A.11, writes both tables to `results/output/tables/`.
+The repository contains two stages of the pipeline:
 
-| Paper item | Output |
-|---|---|
-| Table 1 | `results/output/tables/table1.tex` |
-| A.11 persona table | `results/output/tables/a11.tex` |
-| A.7 safety coefficient charts | `results/output/figures/` |
+1. **Attention extraction** (`extract_attentions.py`): runs `Qwen3-14B` on poem/prose prompt pairs and
+   records the attention weights of every layer and head at every decoding step.
+2. **Probing** (`probes/`): fits the paper's probes on the released 72-dimensional attention
+   feature vectors and regenerates the probing tables and figures.
 
-## Settings
-
-[probes/configs/paper.yaml](probes/configs/paper.yaml) holds the configuration parameters of the experiments.  
+The feature vectors used by the probes are released precomputed in `data/probing/features.csv`.
 
 ## Layout
 
 ```
-data/                    features.csv (2,395 rows) and exclusions.csv (46 prompt IDs)
-probes/
-  configs/paper.yaml     every setting of every run
-  runner.py              reads the settings, calls an experiment, writes the table or figures
-  experiments/           one module per paper item; each computes scores and touches no files
-  models/                the three probes: linear.py (logistic regression), svc.py, mlp.py
-  data.py  sampling.py   the cleaned pool, balanced draws and holdouts
-  tables.py  charts.py   refill a printed table; draw a coefficient chart
-results/
-  paper/tables/          original manuscript tables
-  paper/figures/         the three original coefficient plots
-  output/                written by the runs above
-tests/
+extract_attentions.py        stage 1: attention extraction
+requirements-extraction.txt  environment of stage 1
+data/
+  input/example.jsonl        one poem/prose pair of the calibration dataset, for the extraction smoke test
+  probing/features.csv       72-dimensional attention features (2395 rows)
+  probing/exclusions.csv     46 prompts removed before probing
+probes/                      stage 2: probing
+  configs/paper.yaml         every setting of every run
+  runner.py                  reads the settings, calls an experiment, writes the table or figures
+  experiments/               one module per paper item; each computes scores and touches no files
+  models/                    the three probes: linear.py (logistic regression), svc.py, mlp.py
+  data.py  sampling.py       the cleaned pool, balanced draws and holdouts
+  tables.py  charts.py       refill a printed table; draw a coefficient chart
+  tests/
+probing_results/
+  paper/                     the paper's tables and figures; runs write their values into copies of these tables
+  output/                    written by the probing runs (ignored by git)
+extraction_results/          written by the extraction (ignored by git)
+pyproject.toml  uv.lock      environment of stage 2
 ```
 
-## Experiments
+## Setup
 
+The two stages use different PyTorch versions, so they have separate environments. The pinned
+versions are the ones used to produce the paper's results.
 
-- **Table 1.** Logistic regression (L1) and the RBF SVC use five outer folds, grouped by prompt for the format probe, with C chosen by inner cross-validation after scaling the outer training fold. The MLP is scored on five seeded 72/13/15 partitions. Prose safety uses five balanced subsamples of 122 safe and 122 unsafe prompts.
-- **A.11.** Five persona contrasts on ungrouped folds. 
-- **A.8.** Table 1’s MLP evaluation repeated over six hidden-layer shapes and two dropout rates.
+**Extraction** (Python 3.11, a CUDA 12.1-capable GPU with at least 24 GB of memory):
 
+```sh
+python3.11 -m venv .venv-extract
+.venv-extract/bin/pip install -r requirements-extraction.txt
+```
+
+**Probing** (Python 3.12, CPU only, [uv](https://docs.astral.sh/uv/) ≥ 0.13):
+
+```sh
+uv sync --locked
+```
+
+## Data
+
+The prompt dataset is not released, since the prompts are adversarial requests for harmful content.
+
+- **Main dataset** (`--split train`): the prose prompts are 1200 prompts of the public
+  [MLCommons AILuminate](https://github.com/mlcommons/ailuminate) benchmark, of which 3 were
+  discarded because their content did not clearly represent their hazard category; their poetic
+  counterparts can be regenerated with the construction procedure in *Section 3* of the paper.
+- **Calibration dataset** (`--split validation`): 20 hand-crafted poem/prose pairs, used to identify
+  the layer clusters and to calibrate the annotation judges.
+- **`data/input/example.jsonl`** contains one pair of the calibration dataset (`adv_poetry_47`) so
+  that the extraction can be tested end to end.
+- **`data/probing/features.csv`** holds the 72-dimensional attention features of every prompt, with its
+  condition (poetry or prose), safety label and attacker persona. **`data/probing/exclusions.csv`**
+  lists the 46 prompts removed before probing: 41 written in Italian, and 5 whose poetic transformation
+  failed (the generator returned a refusal instead of a poem).
+
+The extraction reads either input format:
+
+| `raw_input` | Format |
+|---|---|
+| JSONL file | one pair per line: `{"release_prompt_id": ..., "poetry_text": ..., "prose_text": ...}` |
+| CSV directory | an AILuminate run with `baseline_fail.csv`, `baseline_success.csv` (prose) and `poetic_fail.csv`, `poetic_success.csv` (poetry); columns used: `prompt_id` (`<variant>::<sample_id>`), `prompt_text`, `safety_status`, `hazard` |
+
+## Stage 1: attention extraction
+
+Run from the repository root with the extraction environment active:
+
+```sh
+# smoke test on the example pair (nothing is written)
+python extract_attentions.py --model_path Qwen/Qwen3-14B --raw_input data/input/example.jsonl
+
+# full extraction
+python extract_attentions.py --model_path Qwen/Qwen3-14B --raw_input <csv_dir> --split train \
+    --save_responses --save_attentions
+```
+
+Outputs go to `extraction_results/<model>/<split>/<sample_id>/<poetry|prose>/`:
+
+- `response.json`, written with `--save_responses`: prompt tokens, model response, timing (+ prompt ID,
+  safety label and hazard for CSV input).
+- `attentions.json`, written with `--save_attentions`: for every decoding step, the generated token
+  and the attention weights of every layer, indexed `[layer][batch][head][query][key]`.
+
+A prompt is skipped when every requested file already exists, and an existing `response.json` is
+never overwritten. `--no-print_ongoing_status` silences the per-token output.
+
+**Generation settings.** Each prompt is formatted as `Question: {text}\nAnswer:` inside the `Qwen3`
+chat template with `enable_thinking=False`. The response is decoded greedily for exactly 50 tokens
+with no end-of-sequence stop, so it may run past the end of the answer. Attention is computed with
+the eager implementation, which is the one that returns attention weights.
+
+**Resources** (measured on the main dataset):
+
+| | |
+|---|---|
+| GPU | NVIDIA RTX 3090, 24 GB; the bf16 model is partly offloaded to the CPU |
+| Time | about 45 s per prompt (median prompt length: 110 tokens) |
+| Disk | about 600 GB of attention tensors for the full main dataset |
+
+## Stage 2: probing
+
+Run from the repository root:
+
+```sh
+uv run python -m probes all       # Table 1, A.11 and the A.10 MLP configuration sweep
+uv run python -m probes figures   # A.12 safety coefficient charts
+uv run pytest                     # tests
+```
+
+| Paper item | Output |
+|---|---|
+| Table 1 | `probing_results/output/tables/table1.tex` |
+| A.11 persona table | `probing_results/output/tables/a11.tex` |
+| A.10 MLP configurations | accuracy spreads printed to the console |
+| A.12 safety coefficient charts | `probing_results/output/figures/` |
+
+Every setting is in [probes/configs/paper.yaml](probes/configs/paper.yaml).
+
+- **Table 1.** Logistic regression (L1) and the RBF SVC use five outer folds, grouped by prompt for the
+  format probe, with C chosen by inner cross-validation after scaling the outer training fold. The MLP
+  is scored on five seeded 72/13/15 partitions. Prose safety uses five balanced subsamples of 122 safe
+  and 122 unsafe prompts (the 125 unsafe prose prompts of the paper, minus those in
+  `data/probing/exclusions.csv`).
+- **A.11.** Five persona contrasts on ungrouped folds.
+- **A.10.** Table 1's MLP evaluation repeated over six hidden-layer shapes and two dropout rates.
+
+## Reproducibility
+
+- **Probing.** Logistic regression and SVC results reproduce Table 1 of the paper exactly. MLP results can differ in
+  the last digit on a different CPU even with the locked environment (e.g. 0.992 ± 0.007 instead of
+  0.993 ± 0.006 for the format probe).
+- **Extraction.** Greedy decoding is deterministic for a given GPU and software stack; results on other
+  hardware can differ slightly.
+- **Sample selection.** The probing code removes the prompts listed in `data/probing/exclusions.csv`
+  before fitting; Table 1 was computed on exactly this sample. The exclusions applied in the
+  supplementary probing experiments varied slightly, so sample counts and individual values
+  regenerated here can differ marginally from the printed ones, e.g. 122 instead of 125 unsafe prose
+  prompts, and the persona table A.11. The tables in the paper are the reference results.
+
+## Licences
+
+The code in this repository is released under the [MIT licence](LICENSE).
+
+| Asset | Licence |
+|---|---|
+| [`Qwen3-14B`](https://huggingface.co/Qwen/Qwen3-14B) | Apache 2.0 |
+| [MLCommons AILuminate](https://github.com/mlcommons/ailuminate) prompts | CC BY 4.0 |
+
+## Citation
+
+If you use this code, please cite the paper:
+
+```bibtex
+@inproceedings{sorokoletova2026metaphor,
+  title     = {Metaphor Is Not All Attention Needs},
+  author    = {Sorokoletova, Olga and Giarrusso, Francesco and De Luca, Giacomo and
+               Bisconti, Piercosma and Prandi, Matteo and Pierucci, Federico and
+               Galisai, Marcello and Suriani, Vincenzo and Nardi, Daniele},
+  booktitle = {Advances in Neural Information Processing Systems},
+  year      = {2026},
+  eprint    = {2605.12128},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.CL},
+  url       = {https://arxiv.org/abs/2605.12128}
+}
+```

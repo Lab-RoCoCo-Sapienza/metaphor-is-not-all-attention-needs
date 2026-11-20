@@ -1,0 +1,55 @@
+cff-version: 1.2.0
+message: "If you use this code, please cite the paper below."
+title: "Metaphor Is Not All Attention Needs"
+type: software
+license: MIT
+repository-code: "https://github.com/Lab-RoCoCo-Sapienza/metaphor-is-not-all-attention-needs"
+authors:
+  - family-names: Sorokoletova
+    given-names: Olga
+  - family-names: Giarrusso
+    given-names: Francesco
+  - family-names: De Luca
+    given-names: Giacomo
+  - family-names: Bisconti
+    given-names: Piercosma
+  - family-names: Prandi
+    given-names: Matteo
+  - family-names: Pierucci
+    given-names: Federico
+  - family-names: Galisai
+    given-names: Marcello
+  - family-names: Suriani
+    given-names: Vincenzo
+  - family-names: Nardi
+    given-names: Daniele
+preferred-citation:
+  type: conference-paper
+  title: "Metaphor Is Not All Attention Needs"
+  authors:
+    - family-names: Sorokoletova
+      given-names: Olga
+    - family-names: Giarrusso
+      given-names: Francesco
+    - family-names: De Luca
+      given-names: Giacomo
+    - family-names: Bisconti
+      given-names: Piercosma
+    - family-names: Prandi
+      given-names: Matteo
+    - family-names: Pierucci
+      given-names: Federico
+    - family-names: Galisai
+      given-names: Marcello
+    - family-names: Suriani
+      given-names: Vincenzo
+    - family-names: Nardi
+      given-names: Daniele
+  collection-title: "Advances in Neural Information Processing Systems"
+  conference:
+    name: "NeurIPS 2026"
+  year: 2026
+  url: "https://arxiv.org/abs/2605.12128"
+  identifiers:
+    - type: other
+      value: "arXiv:2605.12128"
