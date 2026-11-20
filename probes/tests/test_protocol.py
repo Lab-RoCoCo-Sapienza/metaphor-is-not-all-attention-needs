@@ -5,7 +5,7 @@ import numpy as np
 
 from probes.data import FEATURES, arrays, load_data
 from probes.experiments.persona import contrasts
-from probes.experiments.table1 import tasks
+from probes.experiments.format_and_safety import tasks
 from probes.models.mlp import MLPConfig, fit_predict
 from probes.runner import Runner
 from probes.sampling import balance, holdout

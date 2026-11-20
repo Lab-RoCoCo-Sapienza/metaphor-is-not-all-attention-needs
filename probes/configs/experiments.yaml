@@ -35,7 +35,7 @@ all: [table1, a11, a8]
 runs:
   # Table 1: format and safety probes, as printed.
   table1:
-    experiment: table1
+    experiment: format_and_safety
     seed: 42                     # outer folds and estimators
     outer_folds: 5
     inner_folds: 5

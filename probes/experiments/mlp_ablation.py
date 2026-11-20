@@ -7,7 +7,7 @@ import numpy as np
 
 from ..data import arrays
 from ..models.mlp import MLPConfig
-from .table1 import mlp_scores, tasks
+from .format_and_safety import mlp_scores, tasks
 
 SETTINGS = {"hidden_grid", "dropout_grid", "prose_draw_seeds", "mlp_evaluation"}
 

@@ -18,7 +18,7 @@ import yaml
 from .data import ROOT, load_data
 from .tables import OUTPUT, write_table
 
-CONFIG = Path(__file__).resolve().parent / "configs/paper.yaml"
+CONFIG = Path(__file__).resolve().parent / "configs/experiments.yaml"
 
 
 class _UniqueKeyLoader(yaml.SafeLoader):

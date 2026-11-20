@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="media/banner.png" alt="Metaphor Is Not All Attention Needs" width="100%">
+  <img src="media/PoetryPixelBanner.png" alt="Metaphor Is Not All Attention Needs" width="100%">
 </p>
 
 --------------------------------------------------------------------------------
@@ -41,13 +41,12 @@ The feature vectors used by the probes are released precomputed in `data/probing
 
 ```
 extract_attentions.py        stage 1: attention extraction
-requirements-extraction.txt  environment of stage 1
 data/
   input/example.jsonl        one poem/prose pair of the calibration dataset, for the extraction smoke test
   probing/features.csv       72-dimensional attention features (2395 rows)
   probing/exclusions.csv     46 prompts removed before probing
 probes/                      stage 2: probing
-  configs/paper.yaml         every setting of every run
+  configs/experiments.yaml   every setting of every run
   runner.py                  reads the settings, calls an experiment, writes the table or figures
   experiments/               one module per paper item; each computes scores and touches no files
   models/                    the three probes: linear.py (logistic regression), svc.py, mlp.py
@@ -58,26 +57,21 @@ probing_results/
   paper/                     the paper's tables and figures; runs write their values into copies of these tables
   output/                    written by the probing runs (ignored by git)
 extraction_results/          written by the extraction (ignored by git)
-pyproject.toml  uv.lock      environment of stage 2
+pyproject.toml  uv.lock      environment
 ```
 
 ## Setup
 
-The two stages use different PyTorch versions, so they have separate environments. The pinned
-versions are the ones used to produce the paper's results.
-
-**Extraction** (Python 3.11, a CUDA 12.1-capable GPU with at least 24 GB of memory):
-
-```sh
-python3.11 -m venv .venv-extract
-.venv-extract/bin/pip install -r requirements-extraction.txt
-```
-
-**Probing** (Python 3.12, CPU only, [uv](https://docs.astral.sh/uv/) ≥ 0.13):
+To set up the project, simply use the following command with [uv](https://docs.astral.sh/uv/) installed:
 
 ```sh
 uv sync --locked
 ```
+
+On Linux x86-64 and Windows this installs the CUDA 12.1 build of PyTorch 2.4.0.
+
+The **Extraction** stage requires CUDA 12.1-capable GPU with at least 24 GB of memory. **Probing** works on CPU only, even without cuda. 
+
 
 ## Data
 
@@ -112,10 +106,7 @@ The prompt dataset is not released, since the prompts are adversarial requests f
   the layer clusters and to calibrate the annotation judges.
 - **`data/input/example.jsonl`** contains one pair of the calibration dataset (`adv_poetry_47`) so
   that the extraction can be tested end to end.
-- **`data/probing/features.csv`** holds the 72-dimensional attention features of every prompt, with its
-  condition (poetry or prose), safety label and attacker persona. **`data/probing/exclusions.csv`**
-  lists the 46 prompts removed before probing: 41 written in Italian, and 5 whose poetic transformation
-  failed (the generator returned a refusal instead of a poem).
+- **`data/probing/features.csv`** holds the 72-dimensional attention features of every prompt, with its condition (poetry or prose), safety label and attacker persona. **`data/probing/exclusions.csv`** lists the 46 prompts removed before probing: 41 written in Italian, and 5 whose poetic transformation failed (the generator returned a refusal instead of a poem).
 
 The extraction reads either input format:
 
@@ -130,10 +121,10 @@ Run from the repository root with the extraction environment active:
 
 ```sh
 # smoke test on the example pair (nothing is written)
-python extract_attentions.py --model_path Qwen/Qwen3-14B --raw_input data/input/example.jsonl
+uv run python extract_attentions.py --model_path Qwen/Qwen3-14B --raw_input data/input/example.jsonl
 
 # full extraction
-python extract_attentions.py --model_path Qwen/Qwen3-14B --raw_input <csv_dir> --split train \
+uv run python extract_attentions.py --model_path Qwen/Qwen3-14B --raw_input <csv_dir> --split train \
     --save_responses --save_attentions
 ```
 
@@ -177,7 +168,7 @@ uv run pytest                     # tests
 | A.10 MLP configurations | accuracy spreads printed to the console |
 | A.12 safety coefficient charts | `probing_results/output/figures/` |
 
-Every setting is in [probes/configs/paper.yaml](probes/configs/paper.yaml).
+Every setting is in [probes/configs/experiments.yaml](probes/configs/experiments.yaml).
 
 - **Table 1.** Logistic regression (L1) and the RBF SVC use five outer folds, grouped by prompt for the
   format probe, with C chosen by inner cross-validation after scaling the outer training fold. The MLP
@@ -189,16 +180,9 @@ Every setting is in [probes/configs/paper.yaml](probes/configs/paper.yaml).
 
 ## Reproducibility
 
-- **Probing.** Logistic regression and SVC results reproduce Table 1 of the paper exactly. MLP results can differ in
-  the last digit on a different CPU even with the locked environment (e.g. 0.992 ± 0.007 instead of
-  0.993 ± 0.006 for the format probe).
-- **Extraction.** Greedy decoding is deterministic for a given GPU and software stack; results on other
-  hardware can differ slightly.
-- **Sample selection.** The probing code removes the prompts listed in `data/probing/exclusions.csv`
-  before fitting; Table 1 was computed on exactly this sample. The exclusions applied in the
-  supplementary probing experiments varied slightly, so sample counts and individual values
-  regenerated here can differ marginally from the printed ones, e.g. 122 instead of 125 unsafe prose
-  prompts, and the persona table A.11. The tables in the paper are the reference results.
+- **Probing.** Logistic regression and SVC results reproduce Table 1 of the paper exactly. MLP results can differ in the last digit on a different CPU even with the locked environment (e.g. 0.992 ± 0.007 instead of 0.993 ± 0.006 for the format probe).
+- **Extraction.** Greedy decoding is deterministic for a given GPU and software stack; results on other hardware can differ slightly.
+- **Sample selection.** The probing code removes the prompts listed in `data/probing/exclusions.csv` before fitting; Table 1 was computed on exactly this sample. The exclusions applied in the supplementary probing experiments varied slightly, so sample counts and individual values regenerated here can differ marginally from the printed ones, e.g. 122 instead of 125 unsafe prose prompts, and the persona table A.11. The tables in the paper are the reference results.
 
 ## Licences
 
