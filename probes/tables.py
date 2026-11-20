@@ -6,7 +6,7 @@ from tempfile import NamedTemporaryFile
 
 from .data import ROOT
 
-RESULTS = ROOT / "results"
+RESULTS = ROOT / "probing_results"
 OUTPUT = RESULTS / "output"
 # Every reported statistic is a decimal.
 STATISTIC = re.compile(r"[-+]?\d+\.\d+")

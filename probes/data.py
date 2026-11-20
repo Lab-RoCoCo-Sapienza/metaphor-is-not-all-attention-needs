@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
-DATA = ROOT / "data"
+DATA = ROOT / "data" / "probing"
 CATEGORIES = ("FIGURATIVE", "FUNCTION_WORD", "HARMFUL_PAYLOAD", "PUNCTUATION", "SETUP", "TECHNICAL")
 FEATURES = [f"c{c}_p{p}_{group}" for c in range(4) for p in range(3) for group in CATEGORIES]
 
