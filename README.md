@@ -1,13 +1,10 @@
-# Metaphor Is Not All Attention Needs
+<p align="center">
+  <img src="media/banner.png" alt="Metaphor Is Not All Attention Needs" width="100%">
+</p>
 
-*Metaphor Is Not All Attention Needs* investigates why literary jailbreaks, stylistic reformulations
-of harmful requests such as poems and the narrative variants obtained by ablating their poetic
-devices, bypass the safety training of large language models. Using `Qwen3-14B` as an open-weight
-case study, the paper combines input-level ablations of poetic devices with a novel, interpretable
-72-dimensional representation of attention maps, which it clusters and probes. The representation
-aggregates attention over generation phases, layer clusters and functional token groups, with every
-prompt token annotated for its semantic role (figurative language, harmful payload, setup, technical terms,
-function words, punctuation).
+--------------------------------------------------------------------------------
+
+*Metaphor Is Not All Attention Needs* investigates why literary jailbreaks, stylistic reformulations of harmful requests such as poems and the narrative variants obtained by ablating their poetic devices, bypass the safety training of large language models. Using `Qwen3-14B` as an open-weight case study, the paper combines input-level ablations of poetic devices with a novel, interpretable 72-dimensional representation of attention maps, which it clusters and probes. The representation aggregates attention over generation phases, layer clusters and functional token groups, with every prompt token annotated for its semantic role (figurative language, harmful payload, setup, technical terms,function words, punctuation).
 
 The paper was accepted at NeurIPS 2026; the preprint is on [arXiv](https://arxiv.org/abs/2605.12128).
 
@@ -28,10 +25,8 @@ The paper was accepted at NeurIPS 2026; the preprint is on [arXiv](https://arxiv
 
 The repository contains two stages of the pipeline:
 
-1. **Attention extraction** (`extract_attentions.py`): runs `Qwen3-14B` on poem/prose prompt pairs and
-   records the attention weights of every layer and head at every decoding step.
-2. **Probing** (`probes/`): fits the paper's probes on the released 72-dimensional attention
-   feature vectors and regenerates the probing tables and figures.
+1. **Attention extraction** (`extract_attentions.py`): runs `Qwen3-14B` on poem/prose prompt pairs and records the attention weights of every layer and head at every decoding step.
+2. **Probing** (`probes/`): fits the paper's probes on the released 72-dimensional attention feature vectors and regenerates the probing tables and figures.
 
 The feature vectors used by the probes are released precomputed in `data/probing/features.csv`.
 
