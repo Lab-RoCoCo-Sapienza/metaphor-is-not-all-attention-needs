@@ -26,11 +26,8 @@ The repository contains two stages of the pipeline:
 The feature vectors used by the probes are released precomputed in `data/probing/features.csv`.
 
 <p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="media/methodology_dark.png">
-    <source media="(prefers-color-scheme: light)" srcset="media/methodology_light.png">
-    <img src="media/methodology_light.png" alt="Construction of the 72-dimensional attention feature vector" width="100%">
-  </picture>
+  <img src="media/methodology_light.png#gh-light-mode-only" alt="Construction of the 72-dimensional attention feature vector" width="100%">
+  <img src="media/methodology_dark.png#gh-dark-mode-only" alt="Construction of the 72-dimensional attention feature vector" width="100%">
   <br>
   <sub><em>
     Construction of the 72-dimensional attention feature vector. For each prompt, attention from generated
@@ -40,6 +37,7 @@ The feature vectors used by the probes are released precomputed in `data/probing
     TECHNICAL, FUNCTION_WORD, PUNCTUATION}.
   </em></sub>
 </p>
+
 
 ## Layout
 
