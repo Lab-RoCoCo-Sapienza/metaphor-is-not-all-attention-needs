@@ -12,7 +12,7 @@
 # metric, how folds are grouped) is in the code.
 
 mlp:
-  # Table 1 and A.8: one 128-unit hidden layer, checkpoint with the lowest validation loss.
+  # Table 1 and A.10: one 128-unit hidden layer, checkpoint with the lowest validation loss.
   table1: &mlp_table1
     standardize: true            # scale with the statistics of the training rows
     hidden: [128]
@@ -30,7 +30,7 @@ mlp:
     standardize: false
 
 # What `python -m probes all` executes, in this order.
-all: [table1, a11, a8]
+all: [table1, a11, a10]
 
 runs:
   # Table 1: format and safety probes, as printed.
@@ -49,8 +49,8 @@ runs:
       split_seeds: [7, 13, 42, 91, 123]   # format and poetry safety
       prose_split_seeds: [7]              # one split per balanced prose subsample
 
-  # A.8: Table 1's MLP evaluation over hidden sizes and dropout. Prints the accuracy spreads.
-  a8:
+  # A.10: Table 1's MLP evaluation over hidden sizes and dropout. Prints the accuracy spreads.
+  a10:
     experiment: mlp_ablation
     hidden_grid: [[64], [128], [256], [512], [128, 64], [256, 128]]
     dropout_grid: [0.0, 0.1]
@@ -67,7 +67,7 @@ runs:
     logreg_max_iter: 1000
     mlp: *mlp_persona
 
-  # A.7: the two safety coefficient charts. Optional; not part of `all`.
+  # A.12: the two safety coefficient charts. Optional; not part of `all`.
   figures:
     experiment: feature_importance
     seed: 42                     # balanced prose draw and fold shuffling

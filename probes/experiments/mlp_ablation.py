@@ -1,4 +1,4 @@
-"""The A.8 accuracy-spread check over hidden sizes and dropout."""
+"""The A.10 accuracy-spread check over hidden sizes and dropout."""
 from collections import defaultdict
 from dataclasses import replace
 from itertools import product
@@ -30,5 +30,5 @@ def compute(settings, data):
 
 
 def summary(spreads):
-    return ("A.8 accuracy spread across MLP configurations (paper bound ≤ 0.04): "
+    return ("A.10 accuracy spread across MLP configurations (paper bound ≤ 0.04): "
             + ", ".join(f"{task} {value:.5f}" for task, value in spreads.items()))

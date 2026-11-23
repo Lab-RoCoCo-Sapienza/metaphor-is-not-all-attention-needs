@@ -9,5 +9,5 @@ def tuned(grid, cv, max_iter, seed):
 
 
 def fixed(C, max_iter, class_weight=None):
-    """A.11 and A.7: L2-regularized at a fixed C."""
+    """A.11 and A.12: L2-regularized at a fixed C."""
     return LogisticRegression(C=C, max_iter=max_iter, class_weight=class_weight)

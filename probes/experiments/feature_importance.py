@@ -1,4 +1,4 @@
-"""Fit the A.7 safety coefficients and render the two safe-up paper charts."""
+"""Fit the A.12 safety coefficients and render the two safe-up paper charts."""
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import StratifiedKFold

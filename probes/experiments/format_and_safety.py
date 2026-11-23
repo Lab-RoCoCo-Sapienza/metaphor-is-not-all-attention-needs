@@ -51,7 +51,7 @@ def nested_cv_scores(X, y, groups, model, settings):
 
 def mlp_scores(X, y, groups, task, evaluation, config=None):
     """Accuracy on seeded holdouts. `evaluation` is a run's `mlp_evaluation` block;
-    `config` replaces its model, as the A.8 grid does."""
+    `config` replaces its model, as the A.10 grid does."""
     config = config or MLPConfig.from_settings(evaluation["model"])
     seeds = evaluation["prose_split_seeds"] if task == "prose" else evaluation["split_seeds"]
     for seed in seeds:
