@@ -14,8 +14,6 @@ The paper was accepted at NeurIPS 2026; the preprint is on [arXiv](https://arxiv
 - The ablations show that literary jailbreaks misalign the model not through any single poetic device, but through accumulated stylistic and structural irregularities that alter prompt processing and avoid lexical triggers learned during post-training.
 - Robust safety mechanisms may therefore need to account for style-induced shifts in model behavior.
 
-<sub>Findings are established on <code>Qwen3-14B</code> as a case study and are testable hypotheses for other models.</sub>
-
 ## This repository
 
 The repository contains two stages of the pipeline:
@@ -30,9 +28,9 @@ The feature vectors used by the probes are released precomputed in `data/probing
   <img src="media/methodology_dark.png#gh-dark-mode-only" alt="Construction of the 72-dimensional attention feature vector" width="100%">
   <br>
   <sub><em>
-    Construction of the 72-dimensional attention feature vector. For each prompt, attention from generated
-    tokens to input tokens is max-pooled across heads (H = 40 → 1), then aggregated across generation
-    phases (P = 3), layer clusters (C = 4) and functional token groups (G = 6). Each dimension corresponds
+    Construction of the 72-dimensional interpretable attention feature vector. For each prompt k, attention from generated
+    tokens to input tokens is aggregated across attention heads via max-pooling (H = 40 🡒 1), then aggregated across generation
+    phases (P = 3), layer clusters (C = 4) and functional token groups (G = 6) via mean aggregation. Each dimension of the resulting feature vector corresponds
     to a triplet (p<sub>i</sub>, c<sub>j</sub>, f), with f ∈ {FIGURATIVE, HARMFUL_PAYLOAD, SETUP,
     TECHNICAL, FUNCTION_WORD, PUNCTUATION}.
   </em></sub>
