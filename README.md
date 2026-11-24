@@ -174,9 +174,11 @@ uv run python build_features.py --raw_input data/input/example.jsonl --split val
 uv run python build_features.py --raw_input <csv_dir> --split train
 ```
 
-For each prompt the script reads `attentions.json` and `response.json` from `extraction_results/<model>/<split>/<sample_id>/<poetry|prose>/` and the token annotations from `<annotations_dir>/<split>/span_annotations/<annotator>/<sample_id>_<poetry|prose>_spans.json`.
-
-The output, `extraction_results/<model>/features/features_<split>.csv` by default (`--output` to change it), has the format of `data/probing/features.csv`. The attacker persona is read from `--raw_input`. Progress is saved to `<output>.ckpt.jsonl`; `--resume` continues an interrupted run.
+- For each prompt the script reads `attentions.json` and `response.json` from `extraction_results/<model>/<split>/<sample_id>/<poetry|prose>/` and the token annotations from `<annotations_dir>/<split>/span_annotations/<annotator>/<sample_id>_<poetry|prose>_spans.json`.
+- The output, `extraction_results/<model>/features/features_<split>.csv` by default (`--output` to change it), has the format of `data/probing/features.csv`. 
+- The attacker persona is read from `--raw_input`.
+- Progress is saved to `<output>.ckpt.jsonl`. 
+- `--resume` continues an interrupted run.
 
 The safety labels used in the paper are human-verified and are released in `data/probing/features.csv`. The script fills `safety_label` only for responses that carry a verified label, so features built from new extractions have an empty label. The probes (stage 3) read `data/probing/features.csv`. To probe features you have rebuilt, write them there with `--output data/probing/features.csv`. `git restore data/probing/features.csv` brings back the released file.
 
