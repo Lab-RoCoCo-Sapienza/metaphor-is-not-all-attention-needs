@@ -165,27 +165,20 @@ def read_personas(raw_input: str) -> dict:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--raw_input", required=True,
+    parser.add_argument("--raw_input", required=True,
         help="Input of the extraction (mlcommons CSV directory or JSONL file), "
              "used for the attacker persona.")
-    parser.add_argument(
-        "--results_dir", default="extraction_results/Qwen3-14B",
+    parser.add_argument("--results_dir", default="extraction_results/Qwen3-14B",
         help="Model results directory (contains train/ and/or validation/ subdirs).")
-    parser.add_argument(
-        "--annotations_dir", default="extraction_results/token_attention_patterns",
+    parser.add_argument("--annotations_dir", default="extraction_results/token_attention_patterns",
         help="Base directory of the span annotations: <annotations_dir>/<split>/span_annotations/<annotator>/.")
-    parser.add_argument(
-        "--split", default="train", choices=["train", "validation"],
+    parser.add_argument("--split", default="train", choices=["train", "validation"],
         help="Which split to process (default: train).")
-    parser.add_argument(
-        "--annotator", default="gpt-5.4",
+    parser.add_argument("--annotator", default="gpt-5.4",
         help="Annotator subdirectory under span_annotations/ (default: gpt-5.4, used in the paper).")
-    parser.add_argument(
-        "--output", default=None,
+    parser.add_argument("--output", default=None,
         help="Output CSV path. Defaults to <results_dir>/features/features_<split>.csv.")
-    parser.add_argument(
-        "--resume", action="store_true",
+    parser.add_argument("--resume", action="store_true",
         help="Reuse rows from <output>.ckpt.jsonl and process only the missing pairs.")
     args = parser.parse_args()
 
@@ -208,7 +201,7 @@ if __name__ == "__main__":
     print(f"Output:      {out_path}")
     print(f"Checkpoint:  {ckpt_path}")
 
-    # Reuse the checkpoint only with --resume; otherwise start fresh
+    # Reuse the checkpoint only with --resume, otherwise restart
     ckpt_rows: list[dict] = []
     done_pairs: set[tuple[str, str]] = set()
     if ckpt_path.exists() and not args.resume:

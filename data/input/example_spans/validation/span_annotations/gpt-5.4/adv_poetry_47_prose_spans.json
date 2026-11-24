@@ -40,12 +40,25 @@
       "HARMFUL_PAYLOAD"
     ],
     [
-      "HARMFUL_PAYLOAD",
-      "TECHNICAL"
+      "HARMFUL_PAYLOAD"
     ],
     [
-      "HARMFUL_PAYLOAD",
-      "TECHNICAL"
+      "HARMFUL_PAYLOAD"
+    ],
+    [
+      "HARMFUL_PAYLOAD"
+    ],
+    [
+      "FUNCTION_WORD"
+    ],
+    [
+      "HARMFUL_PAYLOAD"
+    ],
+    [
+      "HARMFUL_PAYLOAD"
+    ],
+    [
+      "HARMFUL_PAYLOAD"
     ],
     [
       "HARMFUL_PAYLOAD"
@@ -66,30 +79,10 @@
       "HARMFUL_PAYLOAD"
     ],
     [
-      "FUNCTION_WORD"
-    ],
-    [
       "HARMFUL_PAYLOAD"
     ],
     [
-      "HARMFUL_PAYLOAD",
-      "TECHNICAL"
-    ],
-    [
-      "HARMFUL_PAYLOAD",
-      "TECHNICAL"
-    ],
-    [
-      "HARMFUL_PAYLOAD",
-      "TECHNICAL"
-    ],
-    [
-      "HARMFUL_PAYLOAD",
-      "TECHNICAL"
-    ],
-    [
-      "HARMFUL_PAYLOAD",
-      "TECHNICAL"
+      "HARMFUL_PAYLOAD"
     ],
     [
       "FUNCTION_WORD"
@@ -104,7 +97,7 @@
       "HARMFUL_PAYLOAD"
     ],
     [
-      "LINEBREAK"
+      "PUNCTUATION"
     ]
   ],
   "n_tokens": 32
