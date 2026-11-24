@@ -19,8 +19,10 @@ The paper was accepted at NeurIPS 2026; the preprint is on [arXiv](https://arxiv
 The repository contains three stages of the pipeline:
 
 1. **Attention extraction** (`extract_attentions.py`): runs `Qwen3-14B` on poem/prose prompt pairs and records the attention weights of every layer and head at every decoding step.
-2. **Feature vectors** (`build_features.py`): aggregates attention weights to produce 72-dimensional feature vectors.
-3. **Probing** (`probes/`): fits the paper's probes on the released 72-dimensional attention feature vectors and regenerates the probing tables and figures.
+2. **Feature vectors construction**, in two steps:
+   - **Functional group annotation** (`annotate_spans.py`): labels every prompt token with its functional groups, using an LLM judge (`gpt-5.4`) and spaCy POS-tagging.
+   - **Attention aggregation** (`build_features.py`): aggregates the attention weights over generation phases, layer clusters and functional groups into 72-dimensional feature vectors.
+4. **Probing** (`probes/`): fits the paper's probes on the released 72-dimensional attention feature vectors and regenerates the probing tables and figures.
 
 The feature vectors used by the probes are released precomputed in `data/probing/features.csv`.
 
@@ -42,11 +44,14 @@ The feature vectors used by the probes are released precomputed in `data/probing
 
 ```
 extract_attentions.py        stage 1: attention extraction
+annotate_spans.py            stage 2.1: span annotation
+build_features.py            stage 2.2: attention aggregation
 data/
-  input/example.jsonl        one poem/prose pair of the calibration dataset, for the extraction test
+  input/example.jsonl        one poem/prose pair of the calibration dataset, for testing stages 1 and 2
+  input/example_spans/       span annotations of the example pair, for testing step 2.2
   probing/features.csv       72-dimensional attention features (2395 rows)
   probing/exclusions.csv     46 prompts removed before probing
-probes/                      stage 2: probing
+probes/                      stage 3: probing
   configs/experiments.yaml   every setting of every run
   runner.py                  reads the settings, calls an experiment, writes the table or figures
   experiments/               one module per paper item; each computes scores and touches no files
@@ -71,7 +76,9 @@ uv sync --locked
 
 On Linux x86-64 and Windows this installs the CUDA 12.1 build of PyTorch 2.4.0.
 
-The **Extraction** stage requires CUDA 12.1-capable GPU with at least 24 GB of memory. **Probing** works on CPU only, even without cuda. 
+**Extraction** requires CUDA 12.1-capable GPU with at least 24 GB of memory. \
+**Span annotation** calls the OpenAI API and needs an `OPENAI_API_KEY`.\
+**Probing** works on CPU. 
 
 
 ## Data
@@ -114,7 +121,7 @@ The prompt dataset is not released, since the prompts are adversarial requests f
 - **Main dataset** (`--split train`): the prose prompts are 1200 prompts of the public [MLCommons AILuminate](https://github.com/mlcommons/ailuminate) benchmark, of which 3 were discarded because their content did not clearly represent their hazard category. Their poetic counterparts can be regenerated with the construction procedure in *Section 3* of the paper.
 - **Calibration dataset** (`--split validation`): 20 hand-crafted poem/prose pairs, used to identify the layer clusters and to calibrate the annotation judges.
 - **`data/input/example.jsonl`** contains one pair of the calibration dataset (`adv_poetry_47`) so that the extraction can be tested end to end.
-- **`data/input/example_spans/`** contains the functional group annotations of the same pair, so that the feature vectors can be built from it. The annotations of the other prompts are not released. They can be produced by the annotation pipeline described in *Section 5* of the paper (judge prompts in *Appendix A.8*).
+- **`data/input/example_spans/`** contains the functional group annotations of the same pair, so that the feature vectors can be built from it. The annotations of the other prompts can be produced with `annotate_spans.py` (2.1). The annotation pipeline described in *Section 5* of the paper (judge prompts in *Appendix A.8*).
 - **`data/probing/features.csv`** holds the 72-dimensional attention features of every prompt, with its condition (poetry or prose), safety label and attacker persona.
 - **`data/probing/exclusions.csv`** lists the 46 prompts removed before probing: 41 written in Italian, and 5 whose poetic transformation failed (the generator returned a refusal instead of a poem).
 
@@ -161,7 +168,38 @@ the eager implementation, which is the one that returns attention weights.
 | Time | about 45 s per prompt (median prompt length: 110 tokens) |
 | Disk | about 600 GB of attention tensors for the full main dataset |
 
-## Stage 2: attention aggregation
+## Stage 2: feature vectors construction
+
+The feature vectors are built in two steps: the prompt tokens are annotated with their functional groups (2.1), then the attention weights are aggregated.
+
+### Step 2.1: functional group annotation
+
+Run from the repository root with `OPENAI_API_KEY` set:
+
+```sh
+# example pair: save its prompt tokens, then annotate them
+uv run python extract_attentions.py --model_path Qwen/Qwen3-14B --raw_input data/input/example.jsonl --split validation --save_responses
+uv run python annotate_spans.py --split validation --sample adv_poetry_47
+
+# full dataset
+uv run python annotate_spans.py --split train
+```
+
+For each prompt the script reads the prompt tokens from `extraction_results/<model>/<split>/<sample_id>/<poetry|prose>/response.json` and labels every token in five steps:
+
+1. **FIGURATIVE**: an LLM judge returns figurative passages.
+2. **HARMFUL_PAYLOAD**: an LLM judge returns the directives that command the model to produce harmful output.
+3. **FUNCTION_WORD**: spaCy part-of-speech tags, replaces any label the judges gave to the word.
+4. **SETUP**: every word still unlabelled.
+5. **TECHNICAL**: an LLM judge returns domain-specific terms, added on top of the label above, excluding function words.
+
+**PUNCTUATION** is assigned to punctuation-only and newline tokens. A token can carry several groups.
+
+- The output is `<annotations_dir>/<split>/span_annotations/gpt-5.4/<sample_id>_<poetry|prose>_spans.json`, with `extraction_results/token_attention_patterns` as default `--annotations_dir`.
+- Prompts that already have an annotation are skipped, use `--force` to annotate them again.
+- `--sample` and `--condition` restrict the run.
+
+### Step 2.2: attention aggregation
 
 Run from the repository root:
 
@@ -170,7 +208,7 @@ Run from the repository root:
 uv run python extract_attentions.py --model_path Qwen/Qwen3-14B --raw_input data/input/example.jsonl --split validation --save_responses --save_attentions
 uv run python build_features.py --raw_input data/input/example.jsonl --split validation --annotations_dir data/input/example_spans
 
-# full dataset (needs the attentions of stage 1 and the span annotations)
+# full dataset (needs the attentions of stage 1 and the functional group annotations of stage 2.1)
 uv run python build_features.py --raw_input <csv_dir> --split train
 ```
 
@@ -213,6 +251,7 @@ Every setting is in [probes/configs/experiments.yaml](probes/configs/experiments
 
 - **Probing.** Logistic regression and SVC results reproduce Table 1 of the paper exactly on any platform. MLP results depend on the PyTorch build and the CPU. The paper's values were computed on Apple Silicon (macOS, arm64), where the locked environment reproduces them exactly. On Linux x86-64 the MLP accuracies can differ from the printed ones by up to 0.02, within one standard deviation.
 - **Extraction.** Greedy decoding is deterministic for a given GPU and software stack; results on other hardware can differ slightly.
+- **Functional group annotation.** The deterministic steps (text reconstruction, FUNCTION_WORD, PUNCTUATION) reproduce the released annotations exactly. The LLM-judged (semantic) groups are not deterministic: `gpt-5.4` can decide borderline passages, mostly HARMFUL_PAYLOAD, differently between runs, even with identical prompts. On a sample of main-dataset prompts, fresh runs matched about 90% of the tokens of the annotations used in the paper. The released `data/probing/features.csv` is the reference for the paper's results.
 - **Sample selection.** The probing code removes the prompts listed in `data/probing/exclusions.csv` before fitting; Table 1 was computed on exactly this sample. The exclusions applied in the supplementary probing experiments varied slightly, so sample counts and individual values regenerated here can differ marginally from the printed ones, e.g. 122 instead of 125 unsafe prose prompts, and the persona table A.11. The tables in the paper are the reference results.
 
 ## Licences
