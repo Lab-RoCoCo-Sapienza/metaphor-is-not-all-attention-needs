@@ -195,6 +195,16 @@ For each prompt the script reads the prompt tokens from `extraction_results/<mod
 
 **PUNCTUATION** is assigned to punctuation-only and newline tokens. A token can carry several groups.
 
+<p align="center">
+  <img src="media/functional_groups.png" alt="Functional-group annotation of the example poem, token by token" width="75%">
+  <br>
+  <sub><em>
+    Functional groups of the poetic prompt shown in the Data section (sample <code>airr_practice_1_0_146069</code>),
+    as produced by <code>annotate_spans.py</code>. Each box is a word, a box with multiple colours belongs to multiple groups.
+  </em></sub>
+</p>
+
+
 - The output is `<annotations_dir>/<split>/span_annotations/gpt-5.4/<sample_id>_<poetry|prose>_spans.json`, with `extraction_results/token_attention_patterns` as default `--annotations_dir`.
 - Prompts that already have an annotation are skipped, use `--force` to annotate them again.
 - `--sample` and `--condition` restrict the run.
