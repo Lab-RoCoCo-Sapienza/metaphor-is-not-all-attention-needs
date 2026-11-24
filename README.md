@@ -42,7 +42,7 @@ The feature vectors used by the probes are released precomputed in `data/probing
 ```
 extract_attentions.py        stage 1: attention extraction
 data/
-  input/example.jsonl        one poem/prose pair of the calibration dataset, for the extraction smoke test
+  input/example.jsonl        one poem/prose pair of the calibration dataset, for the extraction test
   probing/features.csv       72-dimensional attention features (2395 rows)
   probing/exclusions.csv     46 prompts removed before probing
 probes/                      stage 2: probing
@@ -120,7 +120,7 @@ The extraction reads either input format:
 Run from the repository root with the extraction environment active:
 
 ```sh
-# smoke test on the example pair (nothing is written)
+# test on the example pair (nothing is written)
 uv run python extract_attentions.py --model_path Qwen/Qwen3-14B --raw_input data/input/example.jsonl
 
 # full extraction
@@ -180,7 +180,7 @@ Every setting is in [probes/configs/experiments.yaml](probes/configs/experiments
 
 ## Reproducibility
 
-- **Probing.** Logistic regression and SVC results reproduce Table 1 of the paper exactly. MLP results can differ in the last digit on a different CPU even with the locked environment (e.g. 0.992 ± 0.007 instead of 0.993 ± 0.006 for the format probe).
+- **Probing.** Logistic regression and SVC results reproduce Table 1 of the paper exactly on any platform. MLP results depend on the PyTorch build and the CPU. The paper's values were computed on Apple Silicon (macOS, arm64), where the locked environment reproduces them exactly. On Linux x86-64 the MLP accuracies can differ from the printed ones by up to 0.02, within one standard deviation.
 - **Extraction.** Greedy decoding is deterministic for a given GPU and software stack; results on other hardware can differ slightly.
 - **Sample selection.** The probing code removes the prompts listed in `data/probing/exclusions.csv` before fitting; Table 1 was computed on exactly this sample. The exclusions applied in the supplementary probing experiments varied slightly, so sample counts and individual values regenerated here can differ marginally from the printed ones, e.g. 122 instead of 125 unsafe prose prompts, and the persona table A.11. The tables in the paper are the reference results.
 
