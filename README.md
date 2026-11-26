@@ -278,16 +278,10 @@ The code in this repository is released under the [MIT licence](LICENSE).
 If you use this code, please cite the paper:
 
 ```bibtex
-@inproceedings{sorokoletova2026metaphor,
-  title     = {Metaphor Is Not All Attention Needs},
-  author    = {Sorokoletova, Olga and Giarrusso, Francesco and De Luca, Giacomo and
-               Bisconti, Piercosma and Prandi, Matteo and Pierucci, Federico and
-               Galisai, Marcello and Suriani, Vincenzo and Nardi, Daniele},
-  booktitle = {Advances in Neural Information Processing Systems},
-  year      = {2026},
-  eprint    = {2605.12128},
-  archivePrefix = {arXiv},
-  primaryClass  = {cs.CL},
-  url       = {https://arxiv.org/abs/2605.12128}
+@article{sorokoletova2026metaphor,
+  title={Metaphor Is Not All Attention Needs},
+  author={Sorokoletova, Olga and Giarrusso, Francesco and De Luca, Giacomo and Bisconti, Piercosma and Prandi, Matteo and Pierucci, Federico and Galisai, Marcello and Suriani, Vincenzo and Nardi, Daniele},
+  journal={arXiv preprint arXiv:2605.12128},
+  year={2026}
 }
 ```
